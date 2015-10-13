@@ -10,6 +10,7 @@ formatWeekdayLong locale wd =
         5 -> "Friday"
         6 -> "Saturday"
         7 -> "Sunday"
+        x -> "invalid weekday: " ++ toString x
 
 getFirstDayOfWeek: String -> Int
 getFirstDayOfWeek locale =
@@ -30,3 +31,4 @@ formatMonth month =
         10 -> "October"
         11 -> "November"
         12 -> "December"
+        x -> "invalid month: " ++ toString x

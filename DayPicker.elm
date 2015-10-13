@@ -35,7 +35,6 @@ type Action
     | SelectYear Int
     | SelectMonth (Int,Int)
     | SelectDay (Int,Int,Int)
-    | SelectDays List(Int,Int,Int)
 
 type alias ActionSignal = Signal.Address Action
 
@@ -43,13 +42,11 @@ update: Action -> Model -> Model
 update action model =
     case action of
         NextMonth ->
-            let (year,month,day) = model.selectedDate
-            in { model |
-                selectedDate <- (year,month+1,day) }
+            { model |
+                initialNewMonth <- Basics.min (model.initialNewMonth+1) 11 }
         PreviousMonth ->
-            let (year,month,day) = model.selectedDate
-            in { model |
-                selectedDate <- (year,month-1,day) }
+            { model |
+                initialNewMonth <- Basics.max (model.initialNewMonth-1) 1 }
         SelectYear year ->
             let (_,month,day) = model.selectedDate
             in { model |
@@ -63,15 +60,39 @@ update action model =
                 | selectedDate <- (year,month,day) }
     |> Debug.watch "model"
 
-viewMonths: ActionSignal -> Model -> Int -> List Html
-viewMonths address model year =
-    --model
-    [model.initialNewMonth..(model.initialNewMonth+model.numberOfMonths)]
-    |> List.indexedMap (viewMonth address model year)
+view: ActionSignal -> Model -> Html
+view address model =
+    div []
+        [ button [ onClick address PreviousMonth ] [ text "prev <" ]
+        , viewCalendar address model
+        , button [ onClick address NextMonth ] [ text "next >" ]
+        ]
 
-viewMonth: ActionSignal -> Model -> Int -> Int -> Int -> Html
-viewMonth address model year key month =
-    div
+viewCalendar: ActionSignal -> Model -> Html
+viewCalendar address model =
+    div [ class "className"
+        , calendarStyle
+        , attribute "role" "widget"
+        , attribute "tabIndex" (toString model.tabIndex)
+        ]
+        ( viewMonths address model )
+
+viewMonths: ActionSignal -> Model -> List Html
+viewMonths address model =
+    let
+        { initialNewMonth, numberOfMonths } = model
+        firstMonth = initialNewMonth
+    in [firstMonth..(firstMonth+numberOfMonths-1)]
+       |> List.indexedMap (viewMonth address model)
+
+viewMonth: ActionSignal -> Model -> Int -> Int -> Html
+viewMonth address model key m =
+    let (y,_,_) = model.selectedDate
+        (year,month) =
+            if m > 12
+                then (y+1,m)
+                else (y,m)
+    in div
         [ class "DayPicker-Month"
         , monthStyle
         , onClick address (SelectMonth (year,month))
@@ -81,7 +102,7 @@ viewMonth address model year key month =
               , monthCaptionStyle
               , onClick address (SelectMonth (year,month))
               ]
-            [ text (DateUtils.formatMonth month) ]
+            [ text (DateUtils.formatMonth month ++ " " ++ toString year) ]
         , div [ class "DayPicker-Weekdays" ]
             [ viewWeekDays address model ]
         , div [ class "DayPicker-Body" ]
@@ -143,14 +164,10 @@ viewWeeksInMonth address model year month =
             ( List.map (viewDay address model year month) weekdays) )
        |> div []
 
-view: ActionSignal -> Model -> Html
-view address model =
-    div [ class "className"
-        , style []
-        , attribute "role" "widget"
-        , attribute "tabIndex" (toString model.tabIndex)
-        ]
-        ( viewMonths address model 2015 )
+{-- styles --}
+
+calendarStyle: Html.Attribute
+calendarStyle = style []
 
 monthStyle: Html.Attribute
 monthStyle =
