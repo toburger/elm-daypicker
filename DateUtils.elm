@@ -1,5 +1,7 @@
 module DateUtils where
 
+import Debug
+
 formatWeekdayLong: String -> Int -> String
 formatWeekdayLong locale wd =
     case wd of
@@ -10,7 +12,7 @@ formatWeekdayLong locale wd =
         5 -> "Friday"
         6 -> "Saturday"
         7 -> "Sunday"
-        x -> "invalid weekday: " ++ toString x
+        x -> Debug.crash ("Invalid weekday: " ++ toString x)
 
 getFirstDayOfWeek: String -> Int
 getFirstDayOfWeek locale =
@@ -31,4 +33,4 @@ formatMonth month =
         10 -> "October"
         11 -> "November"
         12 -> "December"
-        x -> "invalid month: " ++ toString x
+        x -> Debug.crash ("Invalid month: " ++ toString x)
