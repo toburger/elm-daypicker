@@ -43,21 +43,21 @@ update action model =
     case action of
         NextMonth ->
             { model |
-                initialNewMonth <- Basics.min (model.initialNewMonth+1) 11 }
+                initialNewMonth = Basics.min (model.initialNewMonth+1) 11 }
         PreviousMonth ->
             { model |
-                initialNewMonth <- Basics.max (model.initialNewMonth-1) 1 }
+                initialNewMonth = Basics.max (model.initialNewMonth-1) 1 }
         SelectYear year ->
             let (_,month,day) = model.selectedDate
             in { model |
-                selectedDate <- (year,month,day) }
+                selectedDate = (year,month,day) }
         SelectMonth (year,month) ->
             let (_,_,day) = model.selectedDate
             in { model
-                | selectedDate <- (year,month,day) }
+                | selectedDate = (year,month,day) }
         SelectDay (year,month,day) ->
             { model
-                | selectedDate <- (year,month,day) }
+                | selectedDate = (year,month,day) }
     |> Debug.watch "model"
 
 view: ActionSignal -> Model -> Html
