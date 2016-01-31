@@ -7,8 +7,8 @@ import DayPicker exposing (..)
 
 main : Signal Html
 main =
-    StartApp.Simple.start
-        { model = init ( 2015, 1, 1 )
-        , update = update
-        , view = view
-        }
+  StartApp.Simple.start
+    { model = init ( 2015, 1, 1 )
+    , update = update
+    , view = view
+    }
